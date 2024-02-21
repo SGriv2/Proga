@@ -1,25 +1,6 @@
-#include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <stdint.h>
-
-typedef struct
-{
-    int *data;
-    size_t size;
-    size_t capacity;
-} IntVector;
-IntVector *int_vector_new(size_t initial_capacity);
-void int_vector_free(IntVector *v);
-int int_vector_get_item(const IntVector *v, size_t index);
-void int_vector_set_item(IntVector *v, size_t index, int item);
-int int_vector_get_size(const IntVector *v);
-int int_vector_get_capacity(const IntVector *v);
-int int_vector_push_back(IntVector *v, int item);
-int int_vector_reserve(IntVector *v, size_t new_capacity);
-int int_vector_resize(IntVector *v, size_t new_size);
-void int_vector_pop_back(IntVector *v);
-int int_vector_shrink_to_fit(IntVector *v);
+#include "IntVector.h"
 
 IntVector *int_vector_new(size_t initial_capacity) // Создаёт массив нулевого размера.
 {
@@ -129,32 +110,4 @@ int int_vector_reserve(IntVector *v, size_t new_capacity) // Изменить е
         return 0;
     }
     return -1;
-}
-
-int main()
-{
-    IntVector *d_array = int_vector_new(1);
-    int_vector_set_item(d_array, 0, 12);
-    printf("Индекс: %d\n", int_vector_get_item(d_array, 0));
-    printf("Ёмкость массива: %d\n", int_vector_get_capacity(d_array));
-    int_vector_push_back(d_array, 11);
-    printf("Индекс: %d\n", int_vector_get_item(d_array, 1));
-    printf("Размер массива: %d\n", int_vector_get_size(d_array));
-    printf("Ёмкость массива: %d\n", int_vector_get_capacity(d_array));
-    int_vector_push_back(d_array, 35);
-    printf("Размер массива: %d\n", int_vector_get_size(d_array));
-    printf("Индекс: %d\n", int_vector_get_item(d_array, 1));
-    printf("Ёмкость массива: %d\n", int_vector_get_capacity(d_array));
-    int_vector_pop_back(d_array);
-    int_vector_shrink_to_fit(d_array);
-    printf("Размер массива: %d\n", int_vector_get_size(d_array));
-    printf("Ёмкость массива: %d\n", int_vector_get_capacity(d_array));
-    int_vector_resize(d_array, 10);
-    printf("Размер массива: %d\n", int_vector_get_size(d_array));
-    printf("Ёмкость массива: %d\n", int_vector_get_capacity(d_array));
-    int_vector_reserve(d_array, 15);
-    printf("Размер массива: %d\n", int_vector_get_size(d_array));
-    printf("Ёмкость массива: %d\n", int_vector_get_capacity(d_array));
-    int_vector_free(d_array);
-    return 0;
 }

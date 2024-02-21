@@ -1,0 +1,6 @@
+main:
+	gcc -Wall -o app main.c
+run:
+	./app
+clear:
+	rv app
