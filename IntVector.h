@@ -1,11 +1,13 @@
 #pragma once
 #include <stdint.h>
+
 typedef struct
 {
     int *data;
     size_t size;
     size_t capacity;
 } IntVector;
+
 IntVector *int_vector_new(size_t initial_capacity);
 void int_vector_free(IntVector *v);
 int int_vector_get_item(const IntVector *v, size_t index);
