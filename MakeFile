@@ -1,5 +1,5 @@
 main:
-	gcc -Wall -o app main.c
+	gcc -Wall -o app main.c IntVector.c
 run:
 	./app
 clear:
