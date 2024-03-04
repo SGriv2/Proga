@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "IntVector.h"
 
 IntVector *int_vector_new(size_t initial_capacity) // Создаёт массив нулевого размера.
@@ -20,6 +21,23 @@ IntVector *int_vector_new(size_t initial_capacity) // Создаёт масси�
     return struc;
 }
 
+IntVector *int_vector_copy(const IntVector *v)
+{
+    IntVector *t = malloc(sizeof(IntVector));
+    if (t == NULL)
+        return NULL;
+    t->data = malloc(v->capacity * sizeof(int));
+    if (t->data == NULL)
+    {
+        free(t);
+        return NULL;
+    }
+    memcpy(t->data, v->data, sizeof(int) * v->capacity);
+    t->size = v->size;
+    t->capacity = v->capacity;
+    return t;
+}
+
 void int_vector_free(IntVector *v) // Освобождает память, выделенную для вектора v
 {
     free(v->data);
@@ -28,12 +46,36 @@ void int_vector_free(IntVector *v) // Освобождает память, вы�
 
 int int_vector_get_item(const IntVector *v, size_t index) // Выводит элемент под номером index
 {
-    return v->data[index];
+    if (index < v->capacity)
+    {
+        return v->data[index];
+    }
+    else
+    {
+        return -1;
+    }
 }
 
 void int_vector_set_item(IntVector *v, size_t index, int item) // Присваивает элементу под номером index значение item
 {
-    v->data[index] = item;
+    if (index < v->capacity)
+    {
+        v->data[index] = item;
+    }
+    else
+    {
+        int counter = 1;
+        int flag;
+        flag = int_vector_reserve(v, (v->capacity) + counter);
+
+        while (index + 1 != (v->capacity))
+        {
+            flag = int_vector_reserve(v, (v->capacity) + counter);
+            counter++;
+        }
+        int_vector_resize(v, v->size + 1);
+        v->data[index] = item;
+    }
 }
 
 int int_vector_get_size(const IntVector *v) // Возвращает размер вектора
@@ -48,10 +90,10 @@ int int_vector_get_capacity(const IntVector *v) // Возвращает ёмко
 
 int int_vector_push_back(IntVector *v, int item) // Добавляет элемент в конец массива
 {
-    if (v->size < v->capacity) // Если размер меньше ёмкости добавление элемента в конце массива
+    if (v->capacity < v->size) // Если размер меньше ёмкости добавление элемента в конце массива
     {
         v->size++;
-        v->data[v->size] = item;
+        v->data[v->capacity] = item;
     }
     else // Иначе ёмкость увеличивается в 2 раза
     {
@@ -62,7 +104,7 @@ int int_vector_push_back(IntVector *v, int item) // Добавляет элем�
             return -1;
         }
         v->data = t;
-        v->data[v->size] = item;
+        v->data[v->capacity - 1] = item;
         v->size++;
     }
     return 0;
@@ -70,8 +112,10 @@ int int_vector_push_back(IntVector *v, int item) // Добавляет элем�
 
 void int_vector_pop_back(IntVector *v) // Удаляет последний элемент из массива
 {
-    if (v->size != 0)
-        v->size--;
+    if (v->data[v->capacity - 1] != 0)
+    {
+        v->data[v->capacity - 1] = 0;
+    }
 }
 
 int int_vector_shrink_to_fit(IntVector *v) // Уменьшает емкость массива до его размера
@@ -83,41 +127,30 @@ int int_vector_shrink_to_fit(IntVector *v) // Уменьшает емкость 
         if (t == NULL)
             return -1;
         v->data = t;
+        v->capacity = v->size;
         return 0;
     }
     return -1;
 }
 
-int int_vector_resize(IntVector *v, size_t new_size) // Изменяет размер массива
+int int_vector_resize(IntVector *v, size_t new_size) // Изменяет емкость массива
 {
-    if (new_size == v->size)
+    return v->size = new_size;
+}
+
+int int_vector_reserve(IntVector *v, size_t new_capacity) // Изменить размер массива
+{
+    if (new_capacity == v->capacity)
     {
         return 0;
     }
-    if (new_size > v->size)
-    {
-        int *t = (int *)realloc(v->data, new_size * sizeof(int));
-        if (t == NULL)
-            return -1;
-        v->data = t;
-        for (size_t i = new_size - v->size; i < new_size; i++)
-            v->data[i] = 0;
-    }
-    v->size = new_size;
-    v->capacity = new_size;
-    return 0;
-}
-
-int int_vector_reserve(IntVector *v, size_t new_capacity) // Изменить емкость массива
-{
     if (new_capacity > v->capacity)
     {
-        v->capacity = new_capacity;
         int *t = (int *)realloc(v->data, new_capacity * sizeof(int));
         if (t == NULL)
             return -1;
         v->data = t;
-        return 0;
     }
-    return -1;
+    v->capacity = new_capacity;
+    return 0;
 }
