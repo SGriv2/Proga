@@ -1,89 +1,146 @@
 #include <stdio.h>
+#include <stdlib.h>
+
 #include "IntVector.h"
-int main()
-{
-    IntVector *d_array = int_vector_new(3);
-    printf("Ёмкость массива: %ld\n", d_array->capacity);
-    if (d_array->data == NULL)
-    {
-        printf("Память не выделилась!!\n");
+
+IntVector *int_vector_new(size_t initial_capacity){
+    IntVector *vector = (IntVector*)malloc(sizeof(IntVector));
+    if (!vector){
+        free(vector);
+        return NULL;
     }
-    else
-    {
-        int_vector_set_item(d_array, 4, 5);
-        printf("Ёмкость массива: %ld\n", d_array->capacity);
-        for (int i = 0; i < d_array->capacity; i++)
-        {
-            printf("%d ", *(d_array->data + i));
+    else{
+        vector->data = (int*)malloc(sizeof(int) * initial_capacity);
+        vector->capacity = initial_capacity;
+        vector->size = 0;
+        if (!vector->data){
+            free(vector->data);
+            free(vector);
+            return NULL;
         }
-        printf("\n");
+        return vector;
+    }
+}
 
-        printf("_________________________\n\n");
+void print_data(IntVector *vector){
+    printf("Elements: ");
+    for (int i=0; i<vector->capacity; i++){
+        printf("%d ", (vector->data)[i]);
+    }
+    printf("\n");
+}
 
-        int_vector_set_item(d_array, 6, 8);
-        printf("Ёмкость массива: %ld\n", d_array->capacity);
-        printf("Размер массива: %ld\n", d_array->size);
-        for (int i = 0; i < d_array->capacity; i++)
-        {
-            printf("%d ", *(d_array->data + i));
+void int_vector_free(IntVector *vector){
+    free(vector->data);
+    free(vector);    
+}
+
+int vector_get_size(IntVector *vector){
+    return vector->size;
+}
+
+int vector_get_capacity(IntVector *vector){
+    return vector->capacity;
+}
+
+int vector_get_item(const IntVector *vector, size_t index){
+    if (index < vector->capacity){
+        return (vector->data)[index];
+    }
+    else{
+        printf("\nIndexError: | your index: %ld | capacity: %ld |\n\t\t{%ld > %ld}\n", index, vector->capacity, index, vector->capacity);
+        return -1;
+    }
+}
+
+void vector_set_item(IntVector *vector, size_t index, size_t element){
+    if (index < vector->capacity && vector->data[index] == 0){
+        vector->data[index] = element;
+        vector->size += 1;
+    }
+    else{
+        printf("\nIndexError: | your index: %ld | capacity: %ld |\n\t\t{%ld > %ld}\n", index, vector->capacity, index, vector->capacity);
+    }
+}
+
+int int_vector_push_back(IntVector *vector, int element){
+    if (vector->size < vector->capacity){
+        vector->data[vector->size] = element;
+        vector->size += 1;
+    }
+    else{
+        vector->capacity *= 2;
+        int *new_data = (int*)realloc(vector->data, (size_t)vector->capacity * sizeof(int));
+        if (!new_data){
+            free(new_data);
+            return -1;
         }
-        printf("\n");
-        int status = int_vector_get_item(d_array, 15);
-        if (status == -1)
-        {
-            printf("Индекс вышел за пределы массива\n");
-        }
-        else
-        {
-            printf("Элемент - %d\n", status);
-        }
-        int_vector_push_back(d_array, 20);
-        printf("\n");
-
-        printf("_________________________\n\n");
-
-        IntVector *t_array = int_vector_copy(d_array);
-        printf("Ёмкость массива: %ld\n", t_array->capacity);
-        printf("Размер массива: %ld\n", t_array->size);
-        int_vector_set_item(t_array, 10, 25);
-        for (int i = 0; i < t_array->capacity; i++)
-        {
-            printf("%d ", *(t_array->data + i));
-        }
-        printf("\n");
-
-        printf("%d\n", int_vector_get_item(t_array, 6));
-
-        printf("_________________________\n\n");
-
-        int_vector_pop_back(t_array);
-        for (int i = 0; i < t_array->capacity; i++)
-        {
-            printf("%d ", *(t_array->data + i));
-        }
-        printf("\n");
-
-        printf("_________________________\n\n");
-
-        int_vector_shrink_to_fit(t_array);
-
-        int_vector_pop_back(t_array);
-        for (int i = 0; i < t_array->capacity; i++)
-        {
-            printf("%d ", *(t_array->data + i));
-        }
-        printf("\n");
-
-        for (int i = 0; i < d_array->capacity; i++)
-        {
-            printf("%d ", *(d_array->data + i));
-        }
-        printf("\n");
-
-        printf("_________________________\n\n");
-
-        int_vector_free(d_array);
-        int_vector_free(t_array);
+        vector->data = new_data;
+        vector->size += 1;
+        vector->data[vector->capacity / 2] = element;
     }
     return 0;
+}
+
+void int_vector_pop_back(IntVector *vector){
+    if (vector->size != 0){
+        vector->data[vector->size - 1] = 0;
+        vector->size -= 1;
+    }
+}
+
+int int_vector_shrink_to_fit(IntVector *vector){
+    if (vector->size < vector->capacity){
+        vector->capacity = vector->size;
+        int *t = (int *)realloc(vector->data, vector->size * sizeof(int));
+        if (t == NULL){
+            return -1;
+        }
+        vector->data = t;
+        return 0;
+    }
+    return -1;
+}
+
+int int_vector_reserve(IntVector *vector, size_t new_capacity){
+    if (new_capacity > vector->capacity){
+        vector->capacity = new_capacity;
+        int *t = (int *)realloc(vector->data, (size_t)vector->capacity * sizeof(int));
+        if (t == NULL){
+            return -1;
+        }
+        vector->data = t;
+        return 0;
+    }
+    return -1;
+}
+
+int int_vector_resize(IntVector *vector, size_t new_size){
+    if (new_size == vector->size){
+        return 0;
+    }
+    if (new_size > vector->size){
+        int *t = (int *)realloc(vector->data, new_size * sizeof(int));
+        if (t == NULL)
+            return -1;
+        vector->data = t;
+
+        for (size_t i = new_size - vector->size; i < new_size; i++)
+            vector->data[i] = 0;
+    }
+    vector->size = new_size;
+    vector->capacity = new_size;
+    return 0;
+}
+
+IntVector *int_vector_copy(const IntVector *vector){
+    IntVector *copy = int_vector_new(vector->capacity);
+    if (!copy){
+        free(copy);
+        return NULL;
+    } 
+    for (size_t i=0; i<vector->capacity; i++){
+        copy->data[i] = vector->data[i];
+    }
+    return copy;
 }
