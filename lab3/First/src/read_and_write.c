@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
-#include "./sort.h"
 #include "./coder.h"
 
 #define COL_NUMBER 1000000
@@ -66,41 +65,33 @@ void read_dat()
     fread(buf_uint32, sizeof(uint32_t), COL_NUMBER, f_unc);
     fread(buf_uint8, sizeof(uint8_t), COL_NUMBER, f_c);
 
-    fclose(f_c);
-    fclose(f_unc);
+    uint32_t i = 0;
+    uint32_t j = 0;
 
-    merge_sort(buf_uint32, 0, 1000000);
-    merge_sort_uint8(buf_uint8, 0, 1000000);
-
-    f_unc = fopen("uncompressed.dat", "wb");
-    f_c = fopen("compressed.dat", "wb");
-
-    fwrite(buf_uint32, sizeof(uint32_t), COL_NUMBER, f_unc);
-    fwrite(buf_uint8, sizeof(uint8_t), COL_NUMBER, f_c);
-
-    fclose(f_c);
-    fclose(f_unc);
-
-    f_unc = fopen("uncompressed.dat", "rb");
-    f_c = fopen("compressed.dat", "rb");
-
-    fread(buf_uint32, sizeof(uint32_t), COL_NUMBER, f_unc);
-    fread(buf_uint8, sizeof(uint8_t), COL_NUMBER, f_c);
-
-    int i = 0;
-    if (buf_uint32[i] != buf_uint8[i])
+    for (; i <= COL_NUMBER; i++)
     {
-        printf("Файлы не одинаковые\n");
+        for (; j <= COL_NUMBER; j++)
+        {
+            if (buf_uint32[i] != buf_uint8[j])
+            {
+                buf_uint32++;
+            }
+            if (buf_uint32[i] == buf_uint8[j])
+            {
+                buf_uint32++;
+                buf_uint8++;
+            }
+        }
     }
-    else
-    {
-        i++;
-    }
-    if (i = COL_NUMBER)
+
+    if (i - 1 == COL_NUMBER && j - 1 == COL_NUMBER)
     {
         printf("Файлы одинаковые\n");
     }
-
+    else
+    {
+        printf("Файлы не одинаковые\n");
+    }
     fclose(f_c);
     fclose(f_unc);
 }
