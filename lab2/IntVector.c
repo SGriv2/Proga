@@ -27,7 +27,7 @@ IntVector *int_vector_new(size_t initial_capacity)
 
 void int_vector_free(IntVector *vector)
 {
-    free(vector->data);
+    free(vector->data); 
     free(vector);
 }
 
@@ -49,7 +49,6 @@ int vector_get_item(const IntVector *vector, size_t index)
     }
     else
     {
-        printf("\nIndexError: | your index: %ld | capacity: %ld |\n\t\t{%ld > %ld}\n", index, vector->capacity, index, vector->capacity);
         return -1;
     }
 }
@@ -60,10 +59,6 @@ void vector_set_item(IntVector *vector, size_t index, size_t element)
     {
         vector->data[index] = element;
         vector->size += 1;
-    }
-    else
-    {
-        printf("\nIndexError: | your index: %ld | capacity: %ld |\n\t\t{%ld > %ld}\n", index, vector->capacity, index, vector->capacity);
     }
 }
 
@@ -165,4 +160,13 @@ IntVector *int_vector_copy(const IntVector *vector)
         copy->data[i] = vector->data[i];
     }
     return copy;
+}
+
+void print_data(IntVector *vector)
+{
+    for(int i =0; i < vector->capacity; i++)
+    {
+        printf("%d ", vector->data[i]);
+    }
+    printf("\n");
 }

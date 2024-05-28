@@ -1,89 +1,83 @@
 #include <stdio.h>
+
 #include "IntVector.h"
-int main()
-{
-    IntVector *d_array = int_vector_new(3);
-    printf("Ёмкость массива: %ld\n", d_array->capacity);
-    if (d_array->data == NULL)
-    {
-        printf("Память не выделилась!!\n");
+
+int main(){
+    IntVector *tmp = int_vector_new(5);
+    if (tmp != NULL){
+        print_data(tmp);
+        printf(" _________________\n");
+        printf("|Capacity: %d      |\n", vector_get_capacity(tmp));
+        printf("|Size: %d          |\n", vector_get_size(tmp));
+        printf("|__________________|\n");
+
+        for (int i=0; i<tmp->capacity; i++){
+            int element = i+1;
+            vector_set_item(tmp, i, element);
+        }
+
+        int index = 3;
+        int element = vector_get_item(tmp, index);
+        printf("Element in index {%d} = %d\n", index, element);
+
+        index = 4;
+        element = 5;
+        vector_set_item(tmp, index, element);
+        print_data(tmp);
+        vector_set_item(tmp, 1, 2);
+        print_data(tmp);
+
+        printf("\n");
+        int response = int_vector_push_back(tmp, 3);
+        if (response == 0){
+            print_data(tmp);
+        }
+        else{
+            printf("Error in called function 'push_back'\n");
+        }
+
+        printf(" ________________\n");
+        printf("|Capacity: %d     |\n", vector_get_capacity(tmp));
+        printf("|Size: %d         |\n", vector_get_size(tmp));
+        printf("|________________|\n");
+        int_vector_pop_back(tmp);
+        print_data(tmp);
+        printf(" ________________\n");
+        printf("|Capacity: %d     |\n", vector_get_capacity(tmp));
+        printf("|Size: %d         |\n", vector_get_size(tmp));
+        printf("|________________|\n");
+        int_vector_shrink_to_fit(tmp);
+        print_data(tmp);
+        printf(" ________________\n");
+        printf("|Capacity: %d     |\n", vector_get_capacity(tmp));
+        printf("|Size: %d         |\n", vector_get_size(tmp));
+        printf("|________________|\n");
+
+        int_vector_reserve(tmp, 10);
+        print_data(tmp);
+        printf(" ________________\n");
+        printf("|Capacity: %d     |\n", vector_get_capacity(tmp));
+        printf("|Size: %d         |\n", vector_get_size(tmp));
+        printf("|________________|\n");       
+
+        int_vector_resize(tmp, 7);
+        print_data(tmp);
+        printf(" ________________\n");
+        printf("|Capacity: %d     |\n", vector_get_capacity(tmp));
+        printf("|Size: %d         |\n", vector_get_size(tmp));
+        printf("|________________|\n");       
+
+        IntVector *copy_vector = int_vector_copy(tmp);
+        print_data(copy_vector);
+        printf(" ________________\n");
+        printf("|Capacity: %d     |\n", vector_get_capacity(copy_vector));
+        printf("|Size: %d         |\n", vector_get_size(copy_vector));
+        printf("|________________|\n");  
+
+
+        int_vector_free(copy_vector);
+        int_vector_free(tmp);
     }
-    else
-    {
-        int_vector_set_item(d_array, 4, 5);
-        printf("Ёмкость массива: %ld\n", d_array->capacity);
-        for (int i = 0; i < d_array->capacity; i++)
-        {
-            printf("%d ", *(d_array->data + i));
-        }
-        printf("\n");
-
-        printf("_________________________\n\n");
-
-        int_vector_set_item(d_array, 6, 8);
-        printf("Ёмкость массива: %ld\n", d_array->capacity);
-        printf("Размер массива: %ld\n", d_array->size);
-        for (int i = 0; i < d_array->capacity; i++)
-        {
-            printf("%d ", *(d_array->data + i));
-        }
-        printf("\n");
-        int status = int_vector_get_item(d_array, 15);
-        if (status == -1)
-        {
-            printf("Индекс вышел за пределы массива\n");
-        }
-        else
-        {
-            printf("Элемент - %d\n", status);
-        }
-        int_vector_push_back(d_array, 20);
-        printf("\n");
-
-        printf("_________________________\n\n");
-
-        IntVector *t_array = int_vector_copy(d_array);
-        printf("Ёмкость массива: %ld\n", t_array->capacity);
-        printf("Размер массива: %ld\n", t_array->size);
-        int_vector_set_item(t_array, 10, 25);
-        for (int i = 0; i < t_array->capacity; i++)
-        {
-            printf("%d ", *(t_array->data + i));
-        }
-        printf("\n");
-
-        printf("%d\n", int_vector_get_item(t_array, 6));
-
-        printf("_________________________\n\n");
-
-        int_vector_pop_back(t_array);
-        for (int i = 0; i < t_array->capacity; i++)
-        {
-            printf("%d ", *(t_array->data + i));
-        }
-        printf("\n");
-
-        printf("_________________________\n\n");
-
-        int_vector_shrink_to_fit(t_array);
-
-        int_vector_pop_back(t_array);
-        for (int i = 0; i < t_array->capacity; i++)
-        {
-            printf("%d ", *(t_array->data + i));
-        }
-        printf("\n");
-
-        for (int i = 0; i < d_array->capacity; i++)
-        {
-            printf("%d ", *(d_array->data + i));
-        }
-        printf("\n");
-
-        printf("_________________________\n\n");
-
-        int_vector_free(d_array);
-        int_vector_free(t_array);
-    }
+    
     return 0;
 }
